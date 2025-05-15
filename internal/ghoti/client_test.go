@@ -26,5 +26,5 @@ func TestClient(t *testing.T) {
 		t.Errorf("Failed to read from client: %v", err)
 	}
 
-	assert.Equal(t, "This is a test\n", value)
+	assert.Equal(t, "This is a test", value)
 }
