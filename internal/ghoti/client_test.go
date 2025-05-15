@@ -27,4 +27,21 @@ func TestClient(t *testing.T) {
 	}
 
 	assert.Equal(t, "This is a test", value)
+
+	client.Auth()
+	if err != nil {
+		t.Errorf("Failed to authenticate client: %v", err)
+	}
+
+	err = client.Write(4, "This is a test")
+	if err != nil {
+		t.Errorf("Failed to write to client: %v", err)
+	}
+
+	value, err = client.Read(4)
+	if err != nil {
+		t.Errorf("Failed to read from client: %v", err)
+	}
+
+	assert.Equal(t, "This is a test", value)
 }

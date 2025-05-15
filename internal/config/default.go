@@ -45,8 +45,8 @@ func LoadDefaultConfig() Config {
 		readBufferSize: (8 * 1024),
 
 		auth: &DefaultAuthConfig{
-			user: "test_r_service",
-			pass: "123456",
+			user: "test_a_service",
+			pass: "67890",
 		},
 	}
 }

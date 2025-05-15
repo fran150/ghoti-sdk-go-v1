@@ -56,6 +56,66 @@ func (c *GhotiClient) readAll() ([]byte, error) {
 	return output.Bytes(), nil
 }
 
+func (c *GhotiClient) Auth() error {
+	request := fmt.Sprintf("u%s\n", c.config.Auth().User())
+	_, err := c.conn.Write([]byte(request))
+	if err != nil {
+		return err
+	}
+
+	response, err := c.readAll()
+	if err != nil {
+		return err
+	}
+
+	messages := bytes.Split(response, []byte("\n"))
+	for _, message := range messages {
+		if len(message) == 0 {
+			continue
+		}
+
+		if message[0] == 'e' {
+			return fmt.Errorf("error from server: %s", message[1:])
+		}
+
+		if message[0] == 'v' {
+			if string(message[1:]) != c.config.Auth().User() {
+				return fmt.Errorf("invalid user response")
+			}
+
+			request := fmt.Sprintf("p%s\n", c.config.Auth().Pass())
+			_, err := c.conn.Write([]byte(request))
+			if err != nil {
+				return err
+			}
+
+			response, err := c.readAll()
+			if err != nil {
+				return err
+			}
+
+			messages := bytes.Split(response, []byte("\n"))
+			for _, message := range messages {
+				if len(message) == 0 {
+					continue
+				}
+
+				if message[0] == 'e' {
+					return fmt.Errorf("error from server: %s", message[1:])
+				}
+
+				if message[0] == 'v' {
+					if string(message[1:]) != c.config.Auth().User() {
+						return fmt.Errorf("invalid User Response")
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (c *GhotiClient) Read(slot int) (string, error) {
 	request := fmt.Sprintf("r%03d\n", slot)
 	_, err := c.conn.Write([]byte(request))
